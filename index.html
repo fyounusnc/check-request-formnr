@@ -41,7 +41,7 @@
 
     async function loadDropdownData() {
       try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbwVozhZ7kOXnTtMDaPM7YBd5LKShA3D8kNE0ZT0BHZKfR-H3bgWiy__lN-OPejb7x12/exec");
+        const response = await fetch("https://sheetdb.io/api/v1/0xtopdufvxarn");
         dropdownData = await response.json();
 
         // Now that data is ready, add the default rows
