@@ -9,13 +9,14 @@
     th, td { border: 1px solid #ccc; padding: 8px; }
     th { background-color: #f0f0f0; }
     button { padding: 8px 12px; margin: 5px 5px 20px 0; }
+    #sync-status { font-size: 12px; color: gray; margin-bottom: 10px; }
   </style>
 </head>
 <body>
   <h2>Check Request Table</h2>
 
   <button type="button" id="add-row-btn" onclick="addRow()" disabled>+ Add Row</button>
-  <button type="button" onclick="sendDataToJotForm()">Send Data to JotForm</button>
+  <p id="sync-status"></p>
 
   <table>
     <thead>
@@ -53,6 +54,7 @@
           addRow();
           addRow();
           document.getElementById("add-row-btn").disabled = false;
+          autoSyncToJotForm(); // initial sync
         }
 
       } catch (err) {
@@ -94,6 +96,8 @@
       amtInput.step = "0.01";
       amtInput.oninput = calculateTotal;
       row.insertCell(3).appendChild(amtInput);
+
+      autoSyncToJotForm();
     }
 
     function calculateTotal() {
@@ -121,7 +125,7 @@
         `${r.glAccount} | ${r.department} | ${r.description} | $${r.amount}`
       ).join('\n');
 
-      // Send to JotForm via postMessage
+      // Send to JotForm
       window.parent.postMessage({
         type: "UPDATE_FORM",
         data: {
@@ -130,9 +134,15 @@
         }
       }, "*");
 
-      console.log("✅ Data sent to JotForm:", { jsonData, summary });
-      alert("Table data sent to JotForm hidden fields!");
+      document.getElementById("sync-status").textContent = "✅ Table data synced with JotForm";
     }
+
+    function autoSyncToJotForm() {
+      sendDataToJotForm();
+    }
+
+    document.addEventListener("input", autoSyncToJotForm);
+    document.addEventListener("change", autoSyncToJotForm);
   </script>
 </body>
 </html>
