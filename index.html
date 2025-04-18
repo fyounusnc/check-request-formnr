@@ -52,9 +52,14 @@
         console.log("Extracted GLs:", dropdownData.GLAccounts);
         console.log("Extracted Departments:", dropdownData.Departments);
 
-        addRow();
-        addRow();
-        document.getElementById("add-row-btn").disabled = false;
+        const tableBody = document.getElementById("table-body");
+        if (tableBody) {
+          addRow();
+          addRow();
+          document.getElementById("add-row-btn").disabled = false;
+        } else {
+          console.error("💥 table-body not found. DOM may not have loaded properly.");
+        }
 
       } catch (err) {
         console.error("Failed to load dropdown data", err);
@@ -76,7 +81,6 @@
       const rowCount = tableBody.rows.length;
       const row = tableBody.insertRow();
 
-      // GL Account
       const cell1 = row.insertCell(0);
       const glSelect = document.createElement("select");
       glSelect.name = `glAccount${rowCount}`;
@@ -88,7 +92,6 @@
       });
       cell1.appendChild(glSelect);
 
-      // Department
       const cell2 = row.insertCell(1);
       const deptSelect = document.createElement("select");
       deptSelect.name = `department${rowCount}`;
@@ -100,19 +103,17 @@
       });
       cell2.appendChild(deptSelect);
 
-      // Description
       const cell3 = row.insertCell(2);
       const descInput = document.createElement("input");
       descInput.type = "text";
       descInput.name = `description${rowCount}`;
       cell3.appendChild(descInput);
 
-      // Amount
       const cell4 = row.insertCell(3);
       const amtInput = document.createElement("input");
       amtInput.type = "number";
-      amtInput.step = "0.01";
       amtInput.name = `amount${rowCount}`;
+      amtInput.step = "0.01";
       amtInput.oninput = calculateTotal;
       cell4.appendChild(amtInput);
     }
