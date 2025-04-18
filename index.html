@@ -26,7 +26,7 @@
       </tr>
     </thead>
     <tbody id="table-body">
-      <!-- Rows go here -->
+      <!-- Rows will be inserted here -->
     </tbody>
     <tfoot>
       <tr>
@@ -41,11 +41,11 @@
 
     async function loadDropdownData() {
       try {
-        const response = await fetch("https://sheetdb.io/api/v1/0xtopdufvxarn");  // Replace with your real API URL
+        const response = await fetch("https://sheetdb.io/api/v1/0xtopdufvxarn");
         const sheetData = await response.json();
 
         dropdownData = {
-          GLAccounts: [...new Set(sheetData.map(row => row.GLAccount).filter(Boolean))],
+          GLAccounts: [...new Set(sheetData.map(row => row["GL Account"]).filter(Boolean))],
           Departments: [...new Set(sheetData.map(row => row.Department).filter(Boolean))]
         };
 
