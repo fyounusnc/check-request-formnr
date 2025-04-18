@@ -1,120 +1,92 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Check Request Form</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-    th, td { border: 1px solid #ccc; padding: 8px; }
-    th { background-color: #f0f0f0; }
-    button { padding: 8px 12px; margin-bottom: 15px; }
-  </style>
-</head>
-<body>
-  <h2>Check Request Table</h2>
+<script>
+  let dropdownData = { GLAccounts: [], Departments: [] };
 
-  <button type="button" onclick="addRow()">+ Add Row</button>
+  async function loadDropdownData() {
+    try {
+      const response = await fetch("https://sheetdb.io/api/v1/0xtopdufvxarn");
+      const sheetData = await response.json();
 
-  <table>
-    <thead>
-      <tr>
-        <th>GL Account</th>
-        <th>Department</th>
-        <th>Description</th>
-        <th>Amount</th>
-      </tr>
-    </thead>
-    <tbody id="table-body"></tbody>
-    <tfoot>
-      <tr>
-        <td colspan="3"><strong>Grand Total</strong></td>
-        <td id="grand-total">$0.00</td>
-      </tr>
-    </tfoot>
-  </table>
+      console.log("SheetDB raw data:", sheetData); // ✅ debug
 
-  <script>
-    let dropdownData = { GLAccounts: [], Departments: [] };
+      dropdownData = {
+        GLAccounts: [...new Set(sheetData.map(row => row["NR_GL_Account"]).filter(v => !!v))],
+        Departments: [...new Set(sheetData.map(row => row["NR_Department"]).filter(v => !!v))]
+      };
 
-    async function loadDropdownData() {
-      try {
-        const response = await fetch("https://sheetdb.io/api/v1/0xtopdufvxarn");
-        const sheetData = await response.json();
+      console.log("Extracted GLs:", dropdownData.GLAccounts);
+      console.log("Extracted Departments:", dropdownData.Departments);
 
-        dropdownData = {
-          GLAccounts: [...new Set(sheetData.map(row => row["NR_GL_Account"]).filter(Boolean))],
-          Departments: [...new Set(sheetData.map(row => row["NR_Department"]).filter(Boolean))]
-        };
+      addRow();
+      addRow();
+    } catch (err) {
+      console.error("Failed to load dropdown data", err);
+    }
+  }
 
-        addRow();
-        addRow();
-      } catch (err) {
-        console.error("Failed to load dropdown data", err);
-      }
+  function addRow() {
+    if (!Array.isArray(dropdownData.GLAccounts) || !dropdownData.GLAccounts.length) {
+      console.error("GLAccounts not ready");
+      return;
     }
 
-    function addRow() {
-      if (!dropdownData.GLAccounts.length || !dropdownData.Departments.length) {
-        alert("Dropdown data not yet loaded.");
-        return;
-      }
-
-      const tableBody = document.getElementById("table-body");
-      const rowCount = tableBody.rows.length;
-      const row = tableBody.insertRow();
-
-      // GL Account dropdown
-      const cell1 = row.insertCell(0);
-      const glSelect = document.createElement("select");
-      glSelect.name = `glAccount${rowCount}`;
-      dropdownData.GLAccounts.forEach(val => {
-        const opt = document.createElement("option");
-        opt.value = val;
-        opt.textContent = val;
-        glSelect.appendChild(opt);
-      });
-      cell1.appendChild(glSelect);
-
-      // Department dropdown
-      const cell2 = row.insertCell(1);
-      const deptSelect = document.createElement("select");
-      deptSelect.name = `department${rowCount}`;
-      dropdownData.Departments.forEach(val => {
-        const opt = document.createElement("option");
-        opt.value = val;
-        opt.textContent = val;
-        deptSelect.appendChild(opt);
-      });
-      cell2.appendChild(deptSelect);
-
-      // Description
-      const cell3 = row.insertCell(2);
-      const descInput = document.createElement("input");
-      descInput.type = "text";
-      descInput.name = `description${rowCount}`;
-      cell3.appendChild(descInput);
-
-      // Amount
-      const cell4 = row.insertCell(3);
-      const amtInput = document.createElement("input");
-      amtInput.type = "number";
-      amtInput.step = "0.01";
-      amtInput.name = `amount${rowCount}`;
-      amtInput.oninput = calculateTotal;
-      cell4.appendChild(amtInput);
+    if (!Array.isArray(dropdownData.Departments) || !dropdownData.Departments.length) {
+      console.error("Departments not ready");
+      return;
     }
 
-    function calculateTotal() {
-      let total = 0;
-      document.querySelectorAll('input[type="number"]').forEach(input => {
-        const val = parseFloat(input.value);
-        if (!isNaN(val)) total += val;
-      });
-      document.getElementById("grand-total").textContent = `$${total.toFixed(2)}`;
-    }
+    const tableBody = document.getElementById("table-body");
+    const rowCount = tableBody.rows.length;
+    const row = tableBody.insertRow();
 
-    window.onload = loadDropdownData;
-  </script>
-</body>
-</html>
+    // GL Account
+    const cell1 = row.insertCell(0);
+    const glSelect = document.createElement("select");
+    glSelect.name = `glAccount${rowCount}`;
+    dropdownData.GLAccounts.forEach(val => {
+      const opt = document.createElement("option");
+      opt.value = val;
+      opt.textContent = val;
+      glSelect.appendChild(opt);
+    });
+    cell1.appendChild(glSelect);
+
+    // Department
+    const cell2 = row.insertCell(1);
+    const deptSelect = document.createElement("select");
+    deptSelect.name = `department${rowCount}`;
+    dropdownData.Departments.forEach(val => {
+      const opt = document.createElement("option");
+      opt.value = val;
+      opt.textContent = val;
+      deptSelect.appendChild(opt);
+    });
+    cell2.appendChild(deptSelect);
+
+    // Description
+    const cell3 = row.insertCell(2);
+    const descInput = document.createElement("input");
+    descInput.type = "text";
+    descInput.name = `description${rowCount}`;
+    cell3.appendChild(descInput);
+
+    // Amount
+    const cell4 = row.insertCell(3);
+    const amtInput = document.createElement("input");
+    amtInput.type = "number";
+    amtInput.step = "0.01";
+    amtInput.name = `amount${rowCount}`;
+    amtInput.oninput = calculateTotal;
+    cell4.appendChild(amtInput);
+  }
+
+  function calculateTotal() {
+    let total = 0;
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+      const val = parseFloat(input.value);
+      if (!isNaN(val)) total += val;
+    });
+    document.getElementById("grand-total").textContent = `$${total.toFixed(2)}`;
+  }
+
+  window.onload = loadDropdownData;
+</script>
