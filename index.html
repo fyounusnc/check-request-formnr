@@ -3,7 +3,7 @@
 
   async function loadDropdownData() {
     try {
-      const response = await fetch("https://script.google.com/macros/s/AKfycbwlbe7W8Ec_vZgJKZ3nktm1pfo-kz-9YAQgOUJCYUhUCtUZ9R7AcZi9FCwWy0WhxIAM/exec");
+      const response = await fetch("https://script.google.com/macros/s/AKfycbxV3yqKCTHgFYrfavqJhFgibtwkG-Q_cxqpb7W9Q6tJBROYvquNl48Ftaj4IpFeBypr/exec");
       const sheetData = await response.json();
 
       console.log("SheetDB raw data:", sheetData); // ✅ debug
