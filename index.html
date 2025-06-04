@@ -59,6 +59,9 @@
 
       } catch (err) {
         console.error("Failed to load dropdown data:", err);
+        addRow();
+        document.getElementById("add-row-btn").disabled = false;
+        document.getElementById("sync-status").textContent = "⚠️ Using empty dropdowns";
       }
     });
 
